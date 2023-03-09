@@ -1,7 +1,7 @@
 package main
 
 import (
-	"order-service/cmd"
+	"fooddelivery-order-service/cmd"
 )
 
 func main() {

@@ -16,6 +16,8 @@ const (
 	DBMain               = "mysql"
 	PluginGrpcUserClient = "Grpc_User_Client"
 	PluginGrpcAuthClient = "Grpc_auth_client"
+	PluginNats           = "nats"
+	PluginSocket         = "skio"
 )
 
 type Requester interface {

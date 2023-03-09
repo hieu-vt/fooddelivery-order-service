@@ -3,9 +3,9 @@ package sdkgorm
 import (
 	"errors"
 	"flag"
+	"fooddelivery-order-service/plugin/sdkgorm/gormdialects"
 	"github.com/200Lab-Education/go-sdk/logger"
 	"gorm.io/gorm"
-	"order-service/plugin/sdkgorm/gormdialects"
 	"strings"
 	"sync"
 )

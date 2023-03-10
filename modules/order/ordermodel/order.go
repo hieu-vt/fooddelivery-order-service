@@ -2,7 +2,7 @@ package ordermodel
 
 import (
 	"errors"
-	"order-service/common"
+	"fooddelivery-order-service/common"
 )
 
 type Order struct {

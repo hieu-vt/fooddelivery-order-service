@@ -1,8 +1,8 @@
 package middleware
 
 import (
+	"fooddelivery-order-service/common"
 	"github.com/gin-gonic/gin"
-	"order-service/common"
 )
 
 func Recover() gin.HandlerFunc {

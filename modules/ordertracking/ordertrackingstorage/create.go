@@ -2,8 +2,8 @@ package ordertrackingstorage
 
 import (
 	"context"
-	"order-service/common"
-	"order-service/modules/ordertracking/ordertrackingmodel"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/ordertracking/ordertrackingmodel"
 )
 
 func (s *sqlStore) Create(ctx context.Context, data *ordertrackingmodel.OrderTracking) error {

@@ -1,13 +1,13 @@
 package ginorder
 
 import (
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/order/orderbiz"
+	"fooddelivery-order-service/modules/order/ordermodel"
+	"fooddelivery-order-service/modules/order/orderstorage"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"order-service/common"
-	"order-service/modules/order/orderbiz"
-	"order-service/modules/order/ordermodel"
-	"order-service/modules/order/orderstorage"
 )
 
 func CreateOrder(sc goservice.ServiceContext) gin.HandlerFunc {

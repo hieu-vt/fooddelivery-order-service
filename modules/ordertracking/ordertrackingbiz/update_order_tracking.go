@@ -2,8 +2,8 @@ package ordertrackingbiz
 
 import (
 	"context"
-	"order-service/common"
-	"order-service/modules/ordertracking/ordertrackingmodel"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/ordertracking/ordertrackingmodel"
 )
 
 type updateOrderTrackingStore interface {

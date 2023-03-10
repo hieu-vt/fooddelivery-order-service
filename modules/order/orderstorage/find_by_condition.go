@@ -2,9 +2,9 @@ package orderstorage
 
 import (
 	"context"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/order/ordermodel"
 	"gorm.io/gorm"
-	"order-service/common"
-	"order-service/modules/order/ordermodel"
 )
 
 func (s *sqlStore) FindByCondition(ctx context.Context, condition map[string]interface{}, moreKeys ...string) (*ordermodel.Order, error) {

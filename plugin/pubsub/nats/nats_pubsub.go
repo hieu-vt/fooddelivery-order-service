@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fooddelivery-order-service/plugin/pubsub"
 	"github.com/200Lab-Education/go-sdk/logger"
 	"github.com/nats-io/nats.go"
-	"order-service/plugin/pubsub"
 	"time"
 )
 

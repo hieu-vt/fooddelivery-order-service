@@ -2,8 +2,8 @@ package orderbiz
 
 import (
 	"context"
-	"order-service/common"
-	"order-service/modules/order/ordermodel"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/order/ordermodel"
 )
 
 type orderStore interface {

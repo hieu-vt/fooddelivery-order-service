@@ -2,9 +2,9 @@ package orderdetailbiz
 
 import (
 	"context"
-	"order-service/common"
-	"order-service/modules/order/ordermodel"
-	"order-service/modules/orderdetails/orderdetailmodel"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/order/ordermodel"
+	"fooddelivery-order-service/modules/orderdetails/orderdetailmodel"
 )
 
 type OrderDetailStore interface {

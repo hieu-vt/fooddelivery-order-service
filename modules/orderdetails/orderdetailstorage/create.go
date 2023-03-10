@@ -2,8 +2,8 @@ package orderdetailstorage
 
 import (
 	"context"
-	"order-service/common"
-	"order-service/modules/orderdetails/orderdetailmodel"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/orderdetails/orderdetailmodel"
 )
 
 func (s *sqlStore) Create(ctx context.Context, orderDetail *orderdetailmodel.OrderDetail) error {

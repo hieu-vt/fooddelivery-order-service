@@ -3,11 +3,11 @@ package appgrpc
 import (
 	"context"
 	"flag"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/proto/user"
 	"github.com/200Lab-Education/go-sdk/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"order-service/common"
-	"order-service/proto/user"
 )
 
 type userClient struct {

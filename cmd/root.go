@@ -41,8 +41,21 @@ var rootCmd = &cobra.Command{
 		}
 
 		service.HTTPServer().AddHandler(func(engine *gin.Engine) {
+			engine.Use(func(c *gin.Context) {
+				c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+				c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+				c.Writer.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+				if c.Request.Method == "OPTIONS" {
+					c.AbortWithStatus(204)
+					return
+				}
+
+				c.Next()
+			})
+
 			engine.Use(middleware.Recover())
-			//sIo := service.MustGet(common.PluginSocket).(sckio.AppSocket)
+
 			handlers.MainRoute(engine, service)
 		})
 

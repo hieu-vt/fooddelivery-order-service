@@ -1,7 +1,7 @@
 package ordermodel
 
 import (
-	"order-service/common"
+	"fooddelivery-order-service/common"
 )
 
 type GetOrderType struct {

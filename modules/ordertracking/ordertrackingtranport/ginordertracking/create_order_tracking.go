@@ -1,13 +1,13 @@
 package ginordertracking
 
 import (
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/ordertracking/ordertrackingbiz"
+	"fooddelivery-order-service/modules/ordertracking/ordertrackingmodel"
+	"fooddelivery-order-service/modules/ordertracking/ordertrackingstorage"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"order-service/common"
-	"order-service/modules/ordertracking/ordertrackingbiz"
-	"order-service/modules/ordertracking/ordertrackingmodel"
-	"order-service/modules/ordertracking/ordertrackingstorage"
 )
 
 func CreateOrderTracking(sc goservice.ServiceContext) gin.HandlerFunc {

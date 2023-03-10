@@ -4,12 +4,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"fooddelivery-order-service/common"
+	auth "fooddelivery-order-service/proto/authen"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	"order-service/common"
-	auth "order-service/proto/authen"
 	"strings"
 )
 

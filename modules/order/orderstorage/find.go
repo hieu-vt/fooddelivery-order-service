@@ -2,8 +2,8 @@ package orderstorage
 
 import (
 	"context"
-	"order-service/common"
-	"order-service/modules/order/ordermodel"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/order/ordermodel"
 )
 
 func (s *sqlStore) Find(ctx context.Context, userId int, paging common.Paging) ([]ordermodel.GetOrderType, error) {

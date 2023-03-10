@@ -2,7 +2,7 @@ package orderdetailmodel
 
 import (
 	"errors"
-	"order-service/common"
+	"fooddelivery-order-service/common"
 	"strings"
 )
 

@@ -83,7 +83,7 @@ func (s *sckServer) StartRealtimeServer(engine *gin.Engine, sc goservice.Service
 
 	s.io = server
 
-	s.io.OnConnect("connection", op.AddObservers(server, sc, s.logger))
+	s.io.OnConnect("/", op.AddObservers(server, sc, s.logger))
 
 	engine.GET("/socket.io/", gin.WrapH(server))
 	engine.POST("/socket.io/", gin.WrapH(server))
@@ -117,6 +117,9 @@ func (s *sckServer) Run() error {
 
 func (s *sckServer) Stop() <-chan bool {
 	c := make(chan bool)
-	go func() { c <- true }()
+	go func() {
+		s.io.Close()
+		c <- true
+	}()
 	return c
 }

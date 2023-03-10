@@ -2,14 +2,14 @@ package ginorderdetail
 
 import (
 	"encoding/json"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/order/orderstorage"
+	"fooddelivery-order-service/modules/orderdetails/orderdetailbiz"
+	"fooddelivery-order-service/modules/orderdetails/orderdetailmodel"
+	"fooddelivery-order-service/modules/orderdetails/orderdetailstorage"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"order-service/common"
-	"order-service/modules/order/orderstorage"
-	"order-service/modules/orderdetails/orderdetailbiz"
-	"order-service/modules/orderdetails/orderdetailmodel"
-	"order-service/modules/orderdetails/orderdetailstorage"
 )
 
 func CreateOrderDetail(sc goservice.ServiceContext) gin.HandlerFunc {

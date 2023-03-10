@@ -2,7 +2,7 @@ package ordertrackingmodel
 
 import (
 	"errors"
-	"order-service/common"
+	"fooddelivery-order-service/common"
 )
 
 const (

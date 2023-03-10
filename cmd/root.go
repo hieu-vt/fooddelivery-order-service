@@ -6,6 +6,7 @@ import (
 	"fooddelivery-order-service/common"
 	"fooddelivery-order-service/middleware"
 	appgrpc "fooddelivery-order-service/plugin/grpc"
+	"fooddelivery-order-service/plugin/pubsub/appredis"
 	"fooddelivery-order-service/plugin/pubsub/nats"
 	sckio "fooddelivery-order-service/plugin/sckio"
 	"fooddelivery-order-service/plugin/sdkgorm"
@@ -24,6 +25,7 @@ func newService() goservice.Service {
 		goservice.WithInitRunnable(appgrpc.NewUserClient(common.PluginGrpcUserClient)),
 		goservice.WithInitRunnable(nats.NewNatsPubSub(common.PluginNats)),
 		goservice.WithInitRunnable(sckio.NewSocketIo(common.PluginSocket)),
+		goservice.WithInitRunnable(appredis.NewAppRedis("redis", common.PluginRedis)),
 	)
 
 	return service

@@ -18,6 +18,7 @@ const (
 	PluginGrpcAuthClient = "Grpc_auth_client"
 	PluginNats           = "nats"
 	PluginSocket         = "skio"
+	PluginRedis          = "redis"
 )
 
 type Requester interface {
@@ -30,6 +31,9 @@ const (
 	EmitUserCreateOrderSuccess = "EmitUserCreateOrderSuccess"
 	EmitUserOrderFailure       = "EmitUserOrderFailure"
 	EmitAuthenticated          = "EmitAuthenticated"
+
+	// Redis key
+	RedisLocation = "locations"
 )
 
 const (
@@ -56,3 +60,9 @@ const (
 	TRACE_SERVICE = "trace-demo"
 	ENVIRONMENT   = "dev"
 )
+
+type LocationData struct {
+	Lat    float64 `json:"lat"`
+	Lng    float64 `json:"lng"`
+	UserId string  `json:"userId"`
+}

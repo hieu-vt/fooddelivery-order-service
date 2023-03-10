@@ -1,10 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"fooddelivery-order-service/common"
 	"fooddelivery-order-service/modules/order/ordertransport/ginorder"
 	"fooddelivery-order-service/modules/orderdetails/orderdetailtransport/ginorderdetail"
 	"fooddelivery-order-service/modules/ordertracking/ordertrackingtranport/ginordertracking"
+	"fooddelivery-order-service/plugin/pubsub/appredis"
 	"fooddelivery-order-service/plugin/sckio"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/200Lab-Education/go-sdk/logger"
@@ -12,6 +14,7 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 	"log"
 	"net/http"
+	"time"
 )
 
 func MainRoute(router *gin.Engine, sc goservice.ServiceContext) {
@@ -25,7 +28,8 @@ func MainRoute(router *gin.Engine, sc goservice.ServiceContext) {
 
 	sIo.StartRealtimeServer(router, sc, op)
 
-	router.StaticFile("/demo", "demo.html")
+	router.StaticFile("/user", "demo.html")
+	router.StaticFile("/shipper", "demoshipper.html")
 
 	v1 := router.Group("/v1")
 	{
@@ -56,30 +60,34 @@ func NewObserverProvider() *observerProvider {
 }
 
 func (observerProvider) AddObservers(server *socketio.Server, sc goservice.ServiceContext, l logger.Logger) func(conn socketio.Conn) error {
-	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
-		log.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
+	authClient := sc.MustGet(common.PluginGrpcAuthClient).(interface {
+		ValidateToken(token string) *common.User
+	})
+	redis := sc.MustGet(common.PluginRedis).(appredis.GeoProvider)
+
+	server.OnEvent("/", "Authenticated", func(s socketio.Conn, token string) common.User {
+		user := authClient.ValidateToken(token)
+
+		user.Mask()
+
+		s.Emit("Authenticated", user)
+
+		return *user
 	})
 
-	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
-		s.SetContext(msg)
-		log.Println("recv " + msg)
-		return "recv " + msg
-	})
+	server.OnEvent("/", "UserUpdateLocation", func(s socketio.Conn, location common.LocationData) {
+		time.Sleep(time.Second * 2)
+		log.Println("location", location)
+		redis.AddDriverLocation(context.Background(), common.RedisLocation, location.Lng, location.Lat, location.UserId)
 
-	server.OnEvent("/", "bye", func(s socketio.Conn) string {
-		last := s.Context().(string)
-		s.Emit("bye", last)
-		s.Close()
-		return last
-	})
+		time.Sleep(time.Second * 4)
+		if location.UserId == "e5352HrePro4" {
+			log.Println("Search location", location)
 
-	server.OnError("/", func(s socketio.Conn, e error) {
-		log.Println("meet error:", e)
-	})
+			lo := redis.SearchDrivers(context.Background(), common.RedisLocation, 10, location.UserId, 100)
 
-	server.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		log.Println("closed", reason)
+			log.Println("Result Search location", lo)
+		}
 	})
 
 	go func() {

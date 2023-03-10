@@ -1,6 +1,7 @@
 package appgrpc
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -116,5 +117,25 @@ func (uc *authClient) RequiredAuth(sc goservice.ServiceContext) func(c *gin.Cont
 		})
 
 		c.Next()
+	}
+}
+
+func (uc *authClient) ValidateToken(token string) *common.User {
+	aRes, err := uc.client.MiddlewareAuthorize(context.Background(), &auth.AuthRequest{Token: token})
+
+	if err != nil {
+		panic(common.ErrNoPermission(err))
+	}
+
+	user := aRes.User
+
+	if user.Status == 0 || user.Id <= 0 {
+		panic(common.ErrNoPermission(errors.New("user has been deleted or banned")))
+	}
+
+	return &common.User{
+		Id:    int(user.Id),
+		Email: user.Email,
+		Role:  "",
 	}
 }

@@ -32,7 +32,7 @@ func CreateOrderTracking(sc goservice.ServiceContext) gin.HandlerFunc {
 			State:   data.State,
 		}
 
-		if err := biz.CreateOrderTracking(c, &createOrder); err != nil {
+		if err := biz.CreateOrderTracking(c, createOrder); err != nil {
 			panic(err)
 		}
 

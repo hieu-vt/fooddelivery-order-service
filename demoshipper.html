@@ -20,7 +20,11 @@ Result Size: 945 x 859
     </div>
     <button type="button" class="btn btn-primary" onclick="onClickAcceptOrder()">Accept order</button>
     <button type="button" class="btn btn-secondary" onclick="onClickArrived()">Arrived</button>
-    <button type="button" class="btn btn-danger" onclick="onRejectOrder()">Reject order</button>
+    <button type="button" class="btn btn-danger" onclick="onSuccesseed()">Successes order</button>
+
+    <div>Orders</div>
+    <ul id="list-order"></ul>
+
 </div>
 <script>
     const socket = io("", {transports: ['websocket']});
@@ -33,6 +37,8 @@ Result Size: 945 x 859
             email,
             "password": "123456"
         }
+
+        console.log(body)
 
         axios({
             method: 'post',
@@ -53,23 +59,18 @@ Result Size: 945 x 859
     }
 
     const onClickAcceptOrder = () => {
-        console.log("Shipper Accept order", dataOrder.type);
-        if (dataOrder && dataOrder.type === "OrderStart") {
-            socket.emit("OrderTracking", {...dataOrder, type: "OrderShipperAccept"})
-        }
+        console.log("Shipper accept order", dataOrder.type );
+        socket.emit("OrderTracking", {...dataOrder, type: "waiting_for_shipper"})
     }
-const onClickArrived = () => {
-    console.log("Shipper Arrived test", dataOrder.type );
-    if (dataOrder && dataOrder.type === "OrderProcess") {
-        socket.emit("OrderTracking", {...dataOrder, type: "OrderSuccessfully"})
-    }
-}
 
-    const onRejectOrder = () => {
-        console.log("Shipper Reject Order", dataOrder.type);
-        if (dataOrder && dataOrder.type === "OrderStart") {
-            socket.emit("OrderTracking", {...dataOrder, type: "OrderShipperReject"})
-        }
+    const onClickArrived = () => {
+        console.log("Shipper Arrived test", dataOrder.type );
+            socket.emit("OrderTracking", {...dataOrder, type: "preparing"})
+    }
+
+    const onSuccesseed = () => {
+        console.log("Shipper Successeed", dataOrder.type );
+        socket.emit("OrderTracking", {...dataOrder, type: "delivered"})
     }
 
     const randomLocation = (max, min) => {
@@ -78,6 +79,15 @@ const onClickArrived = () => {
 
 
     socket.on('Authenticated', (msg) => {
+        socket.on("NewOrder" + msg.id, data => {
+            console.log("Orders", data)
+            let ul = document.getElementById("list-order");
+            let li = document.createElement("li");
+            dataOrder = data
+            li.appendChild(document.createTextNode(JSON.stringify(data)));
+            ul.appendChild(li)
+        })
+
         socket.on("OrderTracking", data => {
             console.log("on - OrderTracking", data)
             dataOrder = data;
@@ -89,10 +99,10 @@ const onClickArrived = () => {
         if (intervalLocation) {
             clearInterval(intervalLocation)
         }
-        console.log("UserUpdateLocation")
+        console.log("UserUpdateLocation", msg)
 
         intervalLocation = setInterval(() => {
-                socket.emit("UserUpdateLocation", {lat: randomLocation(21.0245, 22.8), lng: randomLocation(105.84117, 106.1), userId: msg.id})
+                socket.emit("UserUpdateLocation", {lat: randomLocation(21.0245, 22.8), lng: randomLocation(105.84117, 106.1), userId: msg.id, role: msg.role})
         }, 5000)
     });
 

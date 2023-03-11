@@ -18,7 +18,12 @@ const (
 	PluginGrpcAuthClient = "Grpc_auth_client"
 	PluginNats           = "nats"
 	PluginSocket         = "skio"
+	PluginSocketEngine   = "skio_engine"
 	PluginRedis          = "redis"
+
+	// Pubsub
+	TopicUserCreateOrder = "order.create"
+	TopicUserUpdateOrder = "order.update"
 )
 
 type Requester interface {
@@ -33,7 +38,8 @@ const (
 	EmitAuthenticated          = "EmitAuthenticated"
 
 	// Redis key
-	RedisLocation = "locations"
+	RedisShipperLocation = "shipper_locations"
+	RedisUserLocation    = "user_locations"
 )
 
 const (
@@ -43,7 +49,13 @@ const (
 )
 
 const (
+	Authenticated        = "Authenticated"
+	AuthenticationFailed = "authentication_failed"
+
+	UserUpdateLocation = "UserUpdateLocation"
+
 	OrderTracking = "OrderTracking"
+	NewOrder      = "NewOrder"
 )
 
 type TrackingType string
@@ -65,4 +77,5 @@ type LocationData struct {
 	Lat    float64 `json:"lat"`
 	Lng    float64 `json:"lng"`
 	UserId string  `json:"userId"`
+	Role   string  `json:"role"`
 }

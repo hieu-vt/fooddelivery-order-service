@@ -16,16 +16,23 @@ func (s *SimpleUser) Mask() {
 	s.GenUID(DbTypeUser)
 }
 
+var Role string
+
+const (
+	RoleShipper = "shipper"
+	RoleUser    = "user"
+)
+
 type User struct {
 	Id     int    `json:"-" gorm:"column:id;"`
-	FakeId UID    `json:"id" gorm:"-"`
+	FakeId *UID   `json:"id" gorm:"-"`
 	Email  string `json:"last_name" gorm:"last_name"`
-	Role   string `json:"role" gorm:"role"`
+	Role   string `json:"role" gorm:"-"`
 }
 
 func (u *User) Mask() {
 	uid := NewUID(uint32(u.Id), DbTypeUser, 1)
-	u.FakeId = uid
+	u.FakeId = &uid
 }
 
 func (u *User) GetUserId() int {

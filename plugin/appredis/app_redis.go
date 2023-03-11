@@ -5,6 +5,7 @@ import (
 	"flag"
 	"github.com/200Lab-Education/go-sdk/logger"
 	"github.com/go-redis/redis/v8"
+	"log"
 )
 
 var (
@@ -127,7 +128,7 @@ func (ar *appRedis) RemoveDriverLocation(ctx context.Context, key string, id str
 	ar.client.ZRem(ctx, key, id)
 }
 
-func (ar *appRedis) SearchDrivers(ctx context.Context, key string, limit int, memberId string, r float64) []redis.GeoLocation {
+func (ar *appRedis) SearchDrivers(ctx context.Context, key string, limit int, lat float64, lng float64, r float64) *redis.GeoLocation {
 	/*
 		WITHDIST: Also return the distance of the returned items from    the specified center. The distance is returned in the same unit as the unit specified as the radius argument of the command.
 
@@ -135,7 +136,7 @@ func (ar *appRedis) SearchDrivers(ctx context.Context, key string, limit int, me
 
 		WITHHASH: Also return the raw geohash-encoded sorted set score of the item, in the form of a 52 bit unsigned integer. This is only useful for low level hacks or debugging and is otherwise of little interest for the general user.
 	*/
-	res, _ := ar.client.GeoRadiusByMember(ctx, key, memberId, &redis.GeoRadiusQuery{
+	res, _ := ar.client.GeoRadius(ctx, key, lng, lat, &redis.GeoRadiusQuery{
 		Radius:      r,
 		Unit:        "km",
 		WithGeoHash: true,
@@ -145,17 +146,11 @@ func (ar *appRedis) SearchDrivers(ctx context.Context, key string, limit int, me
 		Sort:        "ASC",
 	}).Result()
 
-	filteredRes := make([]redis.GeoLocation, 0)
-
-	if len(res)-1 == 0 {
+	if len(res) <= 0 {
 		return nil
 	}
 
-	for _, loc := range res {
-		if loc.Name != memberId {
-			filteredRes = append(filteredRes, loc)
-		}
-	}
+	log.Println("here", res[0])
 
-	return filteredRes
+	return &res[0]
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type orderTrackingStore interface {
-	Create(ctx context.Context, data *ordertrackingmodel.OrderTracking) error
+	Create(ctx context.Context, data ordertrackingmodel.OrderTracking) error
 }
 
 type orderTrackingBiz struct {
@@ -20,10 +20,12 @@ func NewOrderTrackingBiz(store orderTrackingStore) *orderTrackingBiz {
 	}
 }
 
-func (biz *orderTrackingBiz) CreateOrderTracking(ctx context.Context, data *ordertrackingmodel.OrderTracking) error {
+func (biz *orderTrackingBiz) CreateOrderTracking(ctx context.Context, data ordertrackingmodel.OrderTracking) error {
 	if err := data.Validation(); err != nil {
 		return common.ErrNoPermission(err)
 	}
+
+	data.Status = 1
 
 	if err := biz.store.Create(ctx, data); err != nil {
 		return common.ErrCannotCreateEntity(ordertrackingmodel.TableNameOrderTracking, err)

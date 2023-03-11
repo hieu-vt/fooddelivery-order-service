@@ -8,7 +8,7 @@ import (
 )
 
 type OrderDetailStore interface {
-	Create(ctx context.Context, orderDetail *orderdetailmodel.OrderDetail) error
+	Create(ctx context.Context, orderDetail orderdetailmodel.OrderDetail) error
 }
 
 type OrderStore interface {
@@ -16,31 +16,18 @@ type OrderStore interface {
 }
 
 type orderDetailBiz struct {
-	store      OrderDetailStore
-	orderStore OrderStore
-	//pubsub     pubsub.Pubsub
+	store OrderDetailStore
 }
 
-func NewOrderDetailBiz(store OrderDetailStore, orderStore OrderStore) *orderDetailBiz {
+func NewOrderDetailBiz(store OrderDetailStore) *orderDetailBiz {
 	return &orderDetailBiz{
-		store:      store,
-		orderStore: orderStore,
+		store: store,
 	}
 }
 
-func (biz *orderDetailBiz) CreateOrderDetail(ctx context.Context, data *orderdetailmodel.OrderDetail) error {
+func (biz *orderDetailBiz) CreateOrderDetail(ctx context.Context, data orderdetailmodel.OrderDetail) error {
 	if err := data.ValidateOrderDetailData(); err != nil {
 		return common.ErrNoPermission(err)
-	}
-
-	order, err := biz.orderStore.FindByCondition(ctx, map[string]interface{}{"id": data.OrderId})
-
-	if err != nil {
-		return common.ErrEntityNotFound(ordermodel.TableOrderName, err)
-	}
-
-	if order.Status == 0 {
-		return common.ErrEntityNotFound(ordermodel.TableOrderName, err)
 	}
 
 	data.Status = 1

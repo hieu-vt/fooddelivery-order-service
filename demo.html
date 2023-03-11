@@ -102,15 +102,15 @@
         socket.on("OrderTracking", data => {
             console.log("EmitOrderTracking", data)
 
-            if (data.type === "OrderProcess") {
+            if (data.type === "waiting_for_shipper") {
                 console.log("Shipper accept your order!")
             }
 
-            if (data.type === "OrderShipperReject") {
-                console.log("Shipper id: " , data.shipperId, " reject order")
+            if (data.type === "preparing") {
+                console.log("Shipper id: " , data, " reject order")
             }
 
-            if (data.type === "OrderSuccessfully") {
+            if (data.type === "delivered") {
                 console.log("Receiver package success!")
             }
         });
@@ -119,15 +119,12 @@
             clearInterval(intervalLocation)
         }
 
-        intervalLocation = setInterval(() => {
-            socket.emit("UserUpdateLocation", {lat: randomLocation(21.0245, 22.2), lng: randomLocation(105.84117, 106.1), userId: msg.id})
-        }, 3000)
-    });
+        // console.log("UserUpdateLocation", msg)
 
-    socket.on('reply', function(msg){
-        $('#messages').append($('<li>').text(msg));
+        // intervalLocation = setInterval(() => {
+        //     socket.emit("UserUpdateLocation", {lat: randomLocation(21.0245, 22.2), lng: randomLocation(105.84117, 106.1), userId: msg.id, role: msg.role})
+        // }, 3000)
     });
-
     const handleSend = () => {
         // s2.emit('msg', $('#m').val(), function(data){
         //     $('#messages').append($('<li>').text('ACK CALLBACK: ' + data));

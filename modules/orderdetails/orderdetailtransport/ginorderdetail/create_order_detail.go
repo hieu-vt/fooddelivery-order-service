@@ -3,7 +3,6 @@ package ginorderdetail
 import (
 	"encoding/json"
 	"fooddelivery-order-service/common"
-	"fooddelivery-order-service/modules/order/orderstorage"
 	"fooddelivery-order-service/modules/orderdetails/orderdetailbiz"
 	"fooddelivery-order-service/modules/orderdetails/orderdetailmodel"
 	"fooddelivery-order-service/modules/orderdetails/orderdetailstorage"
@@ -21,8 +20,7 @@ func CreateOrderDetail(sc goservice.ServiceContext) gin.HandlerFunc {
 		}
 
 		store := orderdetailstorage.NewSqlStore(common.GetMainDb(sc))
-		orderStore := orderstorage.NewSqlStore(common.GetMainDb(sc))
-		biz := orderdetailbiz.NewOrderDetailBiz(store, orderStore)
+		biz := orderdetailbiz.NewOrderDetailBiz(store)
 
 		orderId, err := common.FromBase58(orderDetail.OrderId)
 
@@ -44,7 +42,7 @@ func CreateOrderDetail(sc goservice.ServiceContext) gin.HandlerFunc {
 			Discount:   orderDetail.Discount,
 		}
 
-		if err := biz.CreateOrderDetail(c, &orderDetailCreated); err != nil {
+		if err := biz.CreateOrderDetail(c, orderDetailCreated); err != nil {
 			panic(err)
 		}
 

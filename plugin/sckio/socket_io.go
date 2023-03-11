@@ -5,18 +5,15 @@ import (
 	"fmt"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/200Lab-Education/go-sdk/logger"
-	"github.com/200Lab-Education/go-sdk/sdkcm"
 	"github.com/gin-gonic/gin"
 	socketio "github.com/googollee/go-socket.io"
-	"io"
 	"net"
 	"net/http"
 	"net/url"
 )
 
 type Conn interface {
-	io.Closer
-
+	Close() error
 	// ID returns session id
 	ID() string
 	URL() url.URL
@@ -47,15 +44,15 @@ type Socket interface {
 	BroadcastTo(room, event string, args ...interface{}) error
 }
 
-type AppSocket interface {
-	ServiceContext() goservice.ServiceContext
-	Logger() logger.Logger
-	CurrentUser() sdkcm.Requester
-	SetCurrentUser(sdkcm.Requester)
-	BroadcastToRoom(room, event string, args ...interface{})
-	String() string
-	Conn
-}
+//type AppSocket interface {
+//	ServiceContext() goservice.ServiceContext
+//	Logger() logger.Logger
+//	CurrentUser() sdkcm.Requester
+//	SetCurrentUser(sdkcm.Requester)
+//	BroadcastToRoom(room, event string, args ...interface{})
+//	String() string
+//	Conn
+//}
 
 type Config struct {
 	Name          string
@@ -113,6 +110,10 @@ func (s *sckServer) Configure() error {
 
 func (s *sckServer) Run() error {
 	return s.Configure()
+}
+
+func (s *sckServer) GetClient() *socketio.Server {
+	return s.io
 }
 
 func (s *sckServer) Stop() <-chan bool {

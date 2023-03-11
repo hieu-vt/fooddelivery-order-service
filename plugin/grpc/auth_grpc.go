@@ -120,11 +120,11 @@ func (uc *authClient) RequiredAuth(sc goservice.ServiceContext) func(c *gin.Cont
 	}
 }
 
-func (uc *authClient) ValidateToken(token string) *common.User {
+func (uc *authClient) ValidateToken(token string) (*common.User, error) {
 	aRes, err := uc.client.MiddlewareAuthorize(context.Background(), &auth.AuthRequest{Token: token})
 
 	if err != nil {
-		panic(common.ErrNoPermission(err))
+		return nil, common.ErrNoPermission(err)
 	}
 
 	user := aRes.User
@@ -136,6 +136,6 @@ func (uc *authClient) ValidateToken(token string) *common.User {
 	return &common.User{
 		Id:    int(user.Id),
 		Email: user.Email,
-		Role:  "",
-	}
+		Role:  user.Role,
+	}, nil
 }

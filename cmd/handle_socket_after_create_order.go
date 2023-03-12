@@ -62,14 +62,16 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 			sIo.StartRealtimeServer(engine, service, op)
 		})
 
-		pb := service.MustGet(common.PluginNats).(pubsub.NatsPubSub)
+		// handle find shipper
+		// handle update state to room
+		go func() {
+			pb := service.MustGet(common.PluginNats).(pubsub.NatsPubSub)
 
-		redisGeoService := service.MustGet(common.PluginRedis).(appredis.GeoProvider)
-		ctx := context.Background()
+			redisGeoService := service.MustGet(common.PluginRedis).(appredis.GeoProvider)
+			ctx := context.Background()
 
-		channel, _ := pb.Subscribe(ctx, common.TopicUserCreateOrder)
+			ch, _ := pb.Subscribe(ctx, common.TopicUserCreateOrder)
 
-		go func(ch <-chan *pubsub.Message) {
 			for msg := range ch {
 				lat := msg.Data()["lat"].(float64)
 				lng := msg.Data()["lng"].(float64)
@@ -88,6 +90,7 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 				orderIdString := &uidOrder
 				userIdString := &uidUser
 
+				// join user to room
 				if userConn != nil {
 					userConn.Join(orderIdString.String())
 				}
@@ -106,6 +109,7 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 								Type:      common.WaitingForShipper,
 							})
 
+							// join shipper to room
 							uConn.Join(orderIdString.String())
 						}
 
@@ -119,7 +123,7 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 					log.Info(err)
 				}
 			}
-		}(channel)
+		}()
 
 		if err := service.Start(); err != nil {
 			log.Fatalln(err)

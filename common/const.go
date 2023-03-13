@@ -19,6 +19,8 @@ const (
 	PluginNats           = "nats"
 	PluginSocket         = "skio"
 	PluginSocketEngine   = "skio_engine"
+	PluginNSocket        = "n_skio"
+	PluginNSocketEngine  = "n_skio_engine"
 	PluginRedis          = "redis"
 
 	// Pubsub

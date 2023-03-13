@@ -8,60 +8,41 @@ import (
 	"fooddelivery-order-service/modules/order/ordertransport/skorder"
 	"fooddelivery-order-service/plugin/appredis"
 	appgrpc "fooddelivery-order-service/plugin/grpc"
+	"fooddelivery-order-service/plugin/nsckio"
 	"fooddelivery-order-service/plugin/pubsub"
 	"fooddelivery-order-service/plugin/pubsub/nats"
-	"fooddelivery-order-service/plugin/sckio"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/200Lab-Education/go-sdk/logger"
-	"github.com/gin-gonic/gin"
-	socketio "github.com/googollee/go-socket.io"
 	"github.com/spf13/cobra"
+	"github.com/zishang520/socket.io/socket"
 	"log"
 	"time"
 )
 
-var StartHandleSocketAfterCreateOrder = &cobra.Command{
-	Use:   "handle-socket-order",
-	Short: "Handle socket after create order",
+var StartNHandleSocketAfterCreateOrder = &cobra.Command{
+	Use:   "new-handle-socket-order",
+	Short: "New handle socket after create order",
 	Run: func(cmd *cobra.Command, args []string) {
 		service := goservice.New(
-			goservice.WithName("food-delivery-socket-order"),
-			goservice.WithVersion("1.0.0"),
 			goservice.WithInitRunnable(nats.NewNatsPubSub(common.PluginNats)),
 			goservice.WithInitRunnable(appgrpc.NewAuthClient(common.PluginGrpcAuthClient)),
-			goservice.WithInitRunnable(sckio.NewSocketIo(common.PluginSocket)),
+			goservice.WithInitRunnable(nsckio.NewNSocketIo(common.PluginNSocket)),
 			goservice.WithInitRunnable(appredis.NewAppRedis("redis", common.PluginRedis)),
-			goservice.WithInitRunnable(sckio.NewSocketEngine(common.PluginSocketEngine)),
+			goservice.WithInitRunnable(nsckio.NewNSocketEngine(common.PluginNSocketEngine)),
 		)
 
 		if err := service.Init(); err != nil {
 			log.Fatalln(err)
 		}
 
-		service.HTTPServer().AddHandler(func(engine *gin.Engine) {
-			engine.Use(func(c *gin.Context) {
-				c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-				c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST")
-				//c.Writer.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-
-				//if c.Request.Method == "OPTIONS" {
-				//	c.AbortWithStatus(204)
-				//	return
-				//}
-
-				c.Next()
-			})
-
-			sIo := service.MustGet(common.PluginSocket).(interface {
-				StartRealtimeServer(engine *gin.Engine, sc goservice.ServiceContext, op sckio.ObserverProvider)
-			})
-			op := NewObserverProvider()
-
-			//engine.StaticFile("/user", "demo.html")
-			//engine.StaticFile("/shipper", "demoshipper.html")
-
-			sIo.StartRealtimeServer(engine, service, op)
+		sIo := service.MustGet(common.PluginNSocket).(interface {
+			StartNRealtimeServer(sc goservice.ServiceContext, f func(client *socket.Socket, sc goservice.ServiceContext, l logger.Logger))
 		})
+
+		//engine.StaticFile("/user", "demo.html")
+		//engine.StaticFile("/shipper", "demoshipper.html")
+
+		sIo.StartNRealtimeServer(service, AddNObservers)
 
 		// handle find shipper
 		// handle update state to room
@@ -81,7 +62,7 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 
 				log := logger.GetCurrent().GetLogger("handle-socket-order")
 
-				se := service.MustGet(common.PluginSocketEngine).(sckio.SocketEngineProvider)
+				se := service.MustGet(common.PluginNSocketEngine).(nsckio.NSocketEngineProvider)
 
 				userConn := se.GetAppSocket(userId)
 
@@ -93,7 +74,7 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 
 				// join user to room
 				if userConn != nil {
-					userConn.Join(orderIdString.String())
+					userConn.Join(socket.Room(orderIdString.String()))
 				}
 
 				job := asyncjob.NewJob(func(ctx context.Context) error {
@@ -103,7 +84,7 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 						uConn := se.GetAppSocket(int(uid.GetLocalID()))
 
 						if uConn != nil {
-							uConn.Emit(common.NewOrder+lo.Name, skorder.EvenOrderMessageData{
+							uConn.Emit(common.NewOrder, skorder.EvenOrderMessageData{
 								UserId:    userIdString.String(),
 								OrderId:   orderIdString.String(),
 								ShipperId: lo.Name,
@@ -111,7 +92,7 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 							})
 
 							// join shipper to room
-							uConn.Join(orderIdString.String())
+							uConn.Join(socket.Room(orderIdString.String()))
 						}
 
 						return nil
@@ -132,40 +113,40 @@ var StartHandleSocketAfterCreateOrder = &cobra.Command{
 	},
 }
 
-type observerProvider struct {
-}
-
-func NewObserverProvider() *observerProvider {
-	return &observerProvider{}
-}
-
-func (observerProvider) AddObservers(server *socketio.Server, sc goservice.ServiceContext, l logger.Logger) func(conn socketio.Conn) error {
+func AddNObservers(client *socket.Socket, sc goservice.ServiceContext, l logger.Logger) {
 	authClient := sc.MustGet(common.PluginGrpcAuthClient).(interface {
 		ValidateToken(token string) (*common.User, error)
 	})
 	redis := sc.MustGet(common.PluginRedis).(appredis.GeoProvider)
-	se := sc.MustGet(common.PluginSocketEngine).(sckio.SocketEngineProvider)
+	se := sc.MustGet(common.PluginNSocketEngine).(nsckio.NSocketEngineProvider)
 
-	server.OnEvent("/", common.Authenticated, func(s sckio.Conn, token string) *common.User {
+	client.On(common.Authenticated, func(datas ...any) {
+		token := datas[0].(string)
 		user, err := authClient.ValidateToken(token)
 
 		if err != nil {
-			s.Emit(common.AuthenticationFailed, err.Error())
-			s.Close()
-			return nil
+			client.Emit(common.AuthenticationFailed, err.Error())
 		}
 
-		se.SaveAppSocket(user.Id, s)
+		se.SaveAppSocket(user.Id, client)
 
 		user.Mask()
 
-		s.Emit(common.Authenticated, user)
-
-		return user
+		client.Emit(common.Authenticated, user)
 	})
 
-	server.OnEvent("/", common.UserUpdateLocation, func(s socketio.Conn, location common.LocationData) {
+	client.On(common.UserUpdateLocation, func(datas ...any) {
+		data := datas[0].(map[string]interface{})
+		location := common.LocationData{
+			Lat:    data["lat"].(float64),
+			Lng:    data["lng"].(float64),
+			UserId: data["userId"].(string),
+			Role:   data["role"].(string),
+		}
+
 		time.Sleep(time.Second * 2)
+
+		log.Println("location: ", location)
 
 		switch location.Role {
 		case common.RoleShipper:
@@ -175,21 +156,15 @@ func (observerProvider) AddObservers(server *socketio.Server, sc goservice.Servi
 		}
 	})
 
-	//server.OnEvent("/", common.OrderTracking, skorder.OnOrderTracking(sc, server))
+	client.On(common.OrderTracking, skorder.OnOrderTracking(sc, client))
 
-	server.OnDisconnect("/", func(conn socketio.Conn, s string) {
-		log.Println(s)
+	client.On("disconnect", func(...any) {
+		log.Println("Client disconnected")
 	})
 
-	go func() {
-		if err := server.Serve(); err != nil {
-			log.Fatalf("socketio listen error: %s\n", err)
-		}
-	}()
-
-	return func(s socketio.Conn) error {
-		s.SetContext("")
-		l.Infoln("connected", s.ID())
-		return nil
-	}
+	//go func() {
+	//	if err := server.Serve(); err != nil {
+	//		log.Fatalf("socketio listen error: %s\n", err)
+	//	}
+	//}()
 }

@@ -108,6 +108,7 @@ func Execute() {
 	rootCmd.AddCommand(outEnvCmd)
 	rootCmd.AddCommand(StartCreateOrderDetailTrackingAfterCreateOrder)
 	rootCmd.AddCommand(StartHandleSocketAfterCreateOrder)
+	rootCmd.AddCommand(StartNHandleSocketAfterCreateOrder)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

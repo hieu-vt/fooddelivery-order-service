@@ -36,11 +36,5 @@ func (biz *orderDetailBiz) CreateOrderDetail(ctx context.Context, data orderdeta
 		return common.ErrCannotCreateEntity(orderdetailmodel.TableNameOrderDetail, err)
 	}
 
-	//biz.pubsub.Publish(ctx, common.TopicCreateOrderTrackingAfterCreateOrderDetail, pubsub.NewMessage(ordertrackingmodel.CreateOrderTracking{
-	//	//SqlModel: common.SqlModel{},
-	//	OrderId: data.OrderId,
-	//	State:   common.WaitingForShipper,
-	//}))
-
 	return nil
 }

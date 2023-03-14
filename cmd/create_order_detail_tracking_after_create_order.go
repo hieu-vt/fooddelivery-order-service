@@ -12,7 +12,6 @@ import (
 	"fooddelivery-order-service/modules/ordertracking/ordertrackingstorage"
 	"fooddelivery-order-service/plugin/pubsub"
 	"fooddelivery-order-service/plugin/pubsub/nats"
-	"fooddelivery-order-service/plugin/sckio"
 	"fooddelivery-order-service/plugin/sdkgorm"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/spf13/cobra"
@@ -26,7 +25,6 @@ var StartCreateOrderDetailTrackingAfterCreateOrder = &cobra.Command{
 		service := goservice.New(
 			goservice.WithInitRunnable(sdkgorm.NewGormDB("main", common.DBMain)),
 			goservice.WithInitRunnable(nats.NewNatsPubSub(common.PluginNats)),
-			goservice.WithInitRunnable(sckio.NewSocketIo(common.PluginSocket)),
 		)
 
 		if err := service.Init(); err != nil {

@@ -1,26 +1,16 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"fooddelivery-order-service/cmd/handlers"
 	"fooddelivery-order-service/common"
-	"fooddelivery-order-service/component/asyncjob"
 	"fooddelivery-order-service/middleware"
-	"fooddelivery-order-service/modules/order/orderbiz"
-	"fooddelivery-order-service/modules/order/ordermodel"
-	"fooddelivery-order-service/modules/order/orderstorage"
-	"fooddelivery-order-service/plugin/appredis"
 	appgrpc "fooddelivery-order-service/plugin/grpc"
-	"fooddelivery-order-service/plugin/pubsub"
 	"fooddelivery-order-service/plugin/pubsub/nats"
-	sckio "fooddelivery-order-service/plugin/sckio"
 	"fooddelivery-order-service/plugin/sdkgorm"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
-	"gorm.io/gorm"
-	"log"
 	"os"
 )
 
@@ -32,8 +22,6 @@ func newService() goservice.Service {
 		goservice.WithInitRunnable(appgrpc.NewAuthClient(common.PluginGrpcAuthClient)),
 		goservice.WithInitRunnable(appgrpc.NewUserClient(common.PluginGrpcUserClient)),
 		goservice.WithInitRunnable(nats.NewNatsPubSub(common.PluginNats)),
-		goservice.WithInitRunnable(sckio.NewSocketIo(common.PluginSocket)),
-		goservice.WithInitRunnable(appredis.NewAppRedis("main-redis", common.PluginRedis)),
 	)
 
 	return service
@@ -69,34 +57,7 @@ var rootCmd = &cobra.Command{
 			handlers.MainRoute(engine, service)
 		})
 
-		go func() {
-			pb := service.MustGet(common.PluginNats).(pubsub.NatsPubSub)
-			db := service.MustGet(common.DBMain).(*gorm.DB)
-
-			ch, _ := pb.Subscribe(context.Background(), common.TopicUserUpdateOrder)
-
-			for msg := range ch {
-				job := asyncjob.NewJob(func(ctx context.Context) error {
-					orderId := msg.Data()["order_id"].(string)
-					shipperId := msg.Data()["shipper_id"].(string)
-
-					store := orderstorage.NewSqlStore(db)
-					biz := orderbiz.NewUpdateOrderBiz(store)
-
-					uidShipper, _ := common.FromBase58(shipperId)
-					uidOrder, _ := common.FromBase58(orderId)
-
-					return biz.UpdateOrder(ctx, int(uidOrder.GetLocalID()), &ordermodel.UpdateOrder{
-						ShipperId: int(uidShipper.GetLocalID()),
-					})
-				})
-
-				if err := asyncjob.NewGroup(true, job).Run(context.Background()); err != nil {
-					log.Println(err)
-				}
-			}
-
-		}()
+		handlers.StartUpdateOrderAfterDelivered(service)
 
 		if err := service.Start(); err != nil {
 			serviceLogger.Fatalln(err)
@@ -107,8 +68,6 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	rootCmd.AddCommand(outEnvCmd)
 	rootCmd.AddCommand(StartCreateOrderDetailTrackingAfterCreateOrder)
-	rootCmd.AddCommand(StartHandleSocketAfterCreateOrder)
-	rootCmd.AddCommand(StartNHandleSocketAfterCreateOrder)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

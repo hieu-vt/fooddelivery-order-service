@@ -6,6 +6,7 @@ require (
 	github.com/200Lab-Education/go-sdk v1.1.3
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/gin-gonic/gin v1.9.0
+	github.com/go-redis/cache/v8 v8.4.4
 	github.com/googollee/go-socket.io v1.7.0
 	github.com/nats-io/nats.go v1.24.0
 	github.com/spf13/cobra v1.6.1
@@ -29,7 +30,7 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
-	github.com/go-redis/cache/v8 v8.4.4 // indirect
+	github.com/go-redis/redis/v8 v8.11.3 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.0 // indirect
 	github.com/gofrs/uuid v4.0.0+incompatible // indirect
@@ -37,7 +38,6 @@ require (
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/gomodule/redigo v1.8.4 // indirect
-	github.com/gookit/color v1.5.0 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
@@ -63,6 +63,7 @@ require (
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
+	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.9 // indirect

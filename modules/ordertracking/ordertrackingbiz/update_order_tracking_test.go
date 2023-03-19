@@ -3,8 +3,8 @@ package ordertrackingbiz
 import (
 	"context"
 	"errors"
-	"order-service/common"
-	"order-service/modules/ordertracking/ordertrackingmodel"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/ordertracking/ordertrackingmodel"
 	"testing"
 )
 

@@ -1,6 +1,7 @@
 package orderdetailmodel
 
 import (
+	"encoding/json"
 	"errors"
 	"fooddelivery-order-service/common"
 	"strings"
@@ -25,19 +26,19 @@ type FoodOrigin struct {
 	total        int     `json:"total" gorm:"-"`
 }
 
-//
-//func (fdOrigin FoodOrigin) Marshal() (error, string) {
-//	 jsonFdOrigin, err := json.Marshal(fdOrigin)
-//
-//	if err != nil {
-//		return errors.New(CannotMarshalFoodOrigin), ""
-//	}
-//
-//	return nil, string(jsonFdOrigin)
-//}
+func (fdOrigin FoodOrigin) Marshal() (error, string) {
+	jsonFdOrigin, err := json.Marshal(fdOrigin)
+
+	if err != nil {
+		return errors.New(CannotMarshalFoodOrigin), ""
+	}
+
+	return nil, string(jsonFdOrigin)
+}
 
 //func (fdOrigin FoodOrigin) UnMarshal() (error, FoodOrigin) {
-//	jsonFdOrigin, err := json.Unmarshal(fdOrigin)
+//	var food FoodOrigin
+//	err := json.Unmarshal(fdOrigin)
 //
 //	if err != nil {
 //		return errors.New(CannotMarshalFoodOrigin), nil

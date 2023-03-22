@@ -36,7 +36,7 @@ func (uc *restaurantClient) Name() string {
 }
 
 func (uc *restaurantClient) InitFlags() {
-	flag.StringVar(&uc.url, uc.GetPrefix()+"-url", "localhost:50051", "URL connect to grpc server")
+	flag.StringVar(&uc.url, uc.GetPrefix()+"-url", "localhost:50052", "URL connect to grpc server")
 }
 
 func (uc *restaurantClient) Configure() error {

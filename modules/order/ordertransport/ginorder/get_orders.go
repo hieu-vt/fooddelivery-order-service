@@ -28,7 +28,7 @@ func GetOrders(sc goservice.ServiceContext) gin.HandlerFunc {
 		storeDetail := orderdetailstorage.NewSqlStore(common.GetMainDb(sc))
 		storeTracking := ordertrackingstorage.NewSqlStore(common.GetMainDb(sc))
 
-		repo := orderrepository.NewGetOrderRepository(store, storeDetail, storeTracking)
+		repo := orderrepository.NewGetOrderRepository(store, storeDetail, storeTracking, nil)
 		biz := orderbiz.NewGetOrderBiz(repo)
 
 		result, err := biz.GetOrders(c, int(requester.GetUserId()), paging)

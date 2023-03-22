@@ -6,11 +6,11 @@ import (
 	"fooddelivery-order-service/modules/ordertracking/ordertrackingmodel"
 )
 
-func (s *sqlStore) FindByIds(ctx context.Context, ids []int, orderDetail *ordertrackingmodel.OrderTracking) error {
-
-	if err := s.db.Where("order_id in (?)", ids).Find(orderDetail).Error; err != nil {
-		return common.ErrDB(err)
+func (s *sqlStore) FindByIds(ctx context.Context, ids []int) ([]ordertrackingmodel.OrderTracking, error) {
+	var result []ordertrackingmodel.OrderTracking
+	if err := s.db.Where("order_id in (?)", ids).Find(&result).Error; err != nil {
+		return nil, common.ErrDB(err)
 	}
 
-	return nil
+	return result, nil
 }

@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package restaurantproto;
+
+option go_package = "restaurant/";
+
+message RestaurantRequest {
+  repeated int32 restaurantIds = 1;
+}
+
+message User {
+  int32 id = 1;
+  string firstName  = 2;
+  string lastName = 3;
+  string role = 4;
+}
+
+message Image {
+  int32 id = 1;
+  string url = 2;
+  int32 width = 3;
+  int32 height = 4;
+  string cloudName = 5;
+  string extension = 6;
+}
+
+
+message Restaurant {
+  int32 id = 1;
+  string name  = 2;
+  string addr = 3;
+  string logo = 4;
+  repeated string cover = 5;
+  int32 likeCount = 6;
+  User owner = 7;
+}
+
+message RestaurantResponse {
+  repeated Restaurant restaurants = 1;
+}
+
+service RestaurantService {
+  rpc GetRestaurantByIds(RestaurantRequest) returns (RestaurantResponse){
+  };
+}
+

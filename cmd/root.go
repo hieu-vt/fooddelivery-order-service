@@ -22,6 +22,7 @@ func newService() goservice.Service {
 		goservice.WithInitRunnable(appgrpc.NewAuthClient(common.PluginGrpcAuthClient)),
 		goservice.WithInitRunnable(appgrpc.NewUserClient(common.PluginGrpcUserClient)),
 		goservice.WithInitRunnable(nats.NewNatsPubSub(common.PluginNats)),
+		goservice.WithInitRunnable(appgrpc.NewRestaurantClient(common.PluginGrpcRestaurantClient)),
 	)
 
 	return service

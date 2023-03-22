@@ -1,7 +1,6 @@
 package common
 
 const (
-	DbTypeRestaurant = 1
 	DbTypeFood       = 2
 	DbTypeCategory   = 3
 	DbTypeUser       = 4
@@ -13,11 +12,12 @@ const (
 const (
 	CurrentUser = "user"
 
-	DBMain               = "mysql"
-	PluginGrpcUserClient = "Grpc_User_Client"
-	PluginGrpcAuthClient = "Grpc_auth_client"
-	PluginNats           = "nats"
-	PluginRedis          = "redis"
+	DBMain                     = "mysql"
+	PluginGrpcUserClient       = "Grpc_User_Client"
+	PluginGrpcRestaurantClient = "Grpc_Restaurant_Client"
+	PluginGrpcAuthClient       = "Grpc_auth_client"
+	PluginNats                 = "nats"
+	PluginRedis                = "redis"
 
 	// Pubsub
 	TopicUserCreateOrder = "order.create"

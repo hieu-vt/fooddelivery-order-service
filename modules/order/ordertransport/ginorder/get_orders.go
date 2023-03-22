@@ -3,7 +3,10 @@ package ginorder
 import (
 	"fooddelivery-order-service/common"
 	"fooddelivery-order-service/modules/order/orderbiz"
+	"fooddelivery-order-service/modules/order/orderrepository"
 	"fooddelivery-order-service/modules/order/orderstorage"
+	"fooddelivery-order-service/modules/orderdetails/orderdetailstorage"
+	"fooddelivery-order-service/modules/ordertracking/ordertrackingstorage"
 	goservice "github.com/200Lab-Education/go-sdk"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -22,7 +25,11 @@ func GetOrders(sc goservice.ServiceContext) gin.HandlerFunc {
 		paging.FullFill()
 
 		store := orderstorage.NewSqlStore(common.GetMainDb(sc))
-		biz := orderbiz.NewGetOrderBiz(store)
+		storeDetail := orderdetailstorage.NewSqlStore(common.GetMainDb(sc))
+		storeTracking := ordertrackingstorage.NewSqlStore(common.GetMainDb(sc))
+
+		repo := orderrepository.NewGetOrderRepository(store, storeDetail, storeTracking)
+		biz := orderbiz.NewGetOrderBiz(repo)
 
 		result, err := biz.GetOrders(c, int(requester.GetUserId()), paging)
 

@@ -6,16 +6,20 @@ import (
 	"fooddelivery-order-service/modules/order/ordermodel"
 )
 
-type orderStore interface {
-	Find(ctx context.Context, userId int, paging common.Paging) ([]ordermodel.GetOrderType, error)
+type orderRepository interface {
+	GetOrders(
+		ctx context.Context,
+		userId int,
+		paging common.Paging,
+	) ([]ordermodel.GetOrderType, error)
 }
 
 type getOrderBiz struct {
-	store orderStore
+	repo orderRepository
 }
 
-func NewGetOrderBiz(store orderStore) *getOrderBiz {
-	return &getOrderBiz{store: store}
+func NewGetOrderBiz(repo orderRepository) *getOrderBiz {
+	return &getOrderBiz{repo: repo}
 }
 
 func (biz *getOrderBiz) GetOrders(
@@ -23,7 +27,7 @@ func (biz *getOrderBiz) GetOrders(
 	userId int,
 	paging common.Paging,
 ) ([]ordermodel.GetOrderType, error) {
-	orders, err := biz.store.Find(ctx, userId, paging)
+	orders, err := biz.repo.GetOrders(ctx, userId, paging)
 
 	if err != nil {
 		return nil, common.ErrEntityNotFound(ordermodel.TableOrderName, err)

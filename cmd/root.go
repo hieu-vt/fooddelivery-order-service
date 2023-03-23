@@ -59,6 +59,7 @@ var rootCmd = &cobra.Command{
 		})
 
 		handlers.StartUpdateOrderAfterDelivered(service)
+		handlers.StartUpdateOrderTracking(service)
 
 		if err := service.Start(); err != nil {
 			serviceLogger.Fatalln(err)

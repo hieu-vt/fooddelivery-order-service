@@ -18,8 +18,8 @@ func NewUpdateOrderBiz(store updateOrderTrackingStore) *updateOrderBiz {
 	return &updateOrderBiz{store: store}
 }
 
-func (biz *updateOrderBiz) UpdateOrderTracking(ctx context.Context, data *ordertrackingmodel.UpdateOrderTracking) error {
-
+func (biz *updateOrderBiz) UpdateOrderTracking(ctx context.Context, orderId int, data *ordertrackingmodel.UpdateOrderTracking) error {
+	data.OrderId = orderId
 	if err := biz.store.Update(ctx, data); err != nil {
 		return common.ErrNoPermission(err)
 	}

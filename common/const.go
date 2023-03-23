@@ -20,8 +20,9 @@ const (
 	PluginRedis                = "redis"
 
 	// Pubsub
-	TopicUserCreateOrder = "order.create"
-	TopicUserUpdateOrder = "order.update"
+	TopicUserCreateOrder     = "order.create"
+	TopicUserUpdateOrder     = "order.update"
+	TopicOrderTrackingUpdate = "ordertracking.update"
 )
 
 type Requester interface {

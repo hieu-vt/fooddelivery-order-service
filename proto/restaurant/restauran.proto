@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package restaurantproto;
+package restaurant;
 
 option go_package = "restaurant/";
 

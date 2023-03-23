@@ -1,6 +1,7 @@
 package ginorder
 
 import (
+	"context"
 	"fooddelivery-order-service/common"
 	"fooddelivery-order-service/modules/order/orderbiz"
 	"fooddelivery-order-service/modules/order/orderrepository"
@@ -27,8 +28,10 @@ func GetOrders(sc goservice.ServiceContext) gin.HandlerFunc {
 		store := orderstorage.NewSqlStore(common.GetMainDb(sc))
 		storeDetail := orderdetailstorage.NewSqlStore(common.GetMainDb(sc))
 		storeTracking := ordertrackingstorage.NewSqlStore(common.GetMainDb(sc))
-
-		repo := orderrepository.NewGetOrderRepository(store, storeDetail, storeTracking, nil)
+		restaurantService := sc.MustGet(common.PluginGrpcRestaurantClient).(interface {
+			GetRestaurants(ctx context.Context, ids []int) ([]common.Restaurant, error)
+		})
+		repo := orderrepository.NewGetOrderRepository(store, storeDetail, storeTracking, restaurantService)
 		biz := orderbiz.NewGetOrderBiz(repo)
 
 		result, err := biz.GetOrders(c, int(requester.GetUserId()), paging)

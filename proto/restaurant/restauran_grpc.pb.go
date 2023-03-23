@@ -35,7 +35,7 @@ func NewRestaurantServiceClient(cc grpc.ClientConnInterface) RestaurantServiceCl
 
 func (c *restaurantServiceClient) GetRestaurantByIds(ctx context.Context, in *RestaurantRequest, opts ...grpc.CallOption) (*RestaurantResponse, error) {
 	out := new(RestaurantResponse)
-	err := c.cc.Invoke(ctx, "/restaurantproto.RestaurantService/GetRestaurantByIds", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/restaurant.RestaurantService/GetRestaurantByIds", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func _RestaurantService_GetRestaurantByIds_Handler(srv interface{}, ctx context.
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/restaurantproto.RestaurantService/GetRestaurantByIds",
+		FullMethod: "/restaurant.RestaurantService/GetRestaurantByIds",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RestaurantServiceServer).GetRestaurantByIds(ctx, req.(*RestaurantRequest))
@@ -90,7 +90,7 @@ func _RestaurantService_GetRestaurantByIds_Handler(srv interface{}, ctx context.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RestaurantService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "restaurantproto.RestaurantService",
+	ServiceName: "restaurant.RestaurantService",
 	HandlerType: (*RestaurantServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

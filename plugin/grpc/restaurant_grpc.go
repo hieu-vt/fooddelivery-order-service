@@ -2,11 +2,14 @@ package appgrpc
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fooddelivery-order-service/common"
 	"fooddelivery-order-service/proto/restaurant"
+	"github.com/200Lab-Education/go-sdk/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"log"
 )
 
 type restaurantClient struct {
@@ -50,6 +53,8 @@ func (uc *restaurantClient) Configure() error {
 
 	uc.client = restaurant.NewRestaurantServiceClient(cc)
 
+	res, err1 := uc.client.GetRestaurantByIds(context.Background(), &restaurant.RestaurantRequest{RestaurantIds: []int32{1}})
+	log.Println(err1, res)
 	return nil
 }
 
@@ -66,7 +71,8 @@ func (uc *restaurantClient) Stop() <-chan bool {
 	return c
 }
 
-func (uc *restaurantClient) GetRestaurantByIds(ctx context.Context, ids []int) ([]common.Restaurant, error) {
+func (uc *restaurantClient) GetRestaurants(ctx context.Context, ids []int) ([]common.Restaurant, error) {
+	logger.GetCurrent().GetLogger(uc.prefix).Infoln("GetRestaurantByIds grpc store running")
 	newIds := make([]int32, len(ids))
 	for i := range ids {
 		newIds[i] = int32(ids[i])
@@ -81,13 +87,16 @@ func (uc *restaurantClient) GetRestaurantByIds(ctx context.Context, ids []int) (
 	result := make([]common.Restaurant, len(res.Restaurants))
 
 	for i := range res.Restaurants {
+		var logo common.Image
+		_ = json.Unmarshal([]byte(res.Restaurants[i].Logo), &logo)
+
 		result[i] = common.Restaurant{
 			Name:      res.Restaurants[i].Name,
 			Addr:      res.Restaurants[i].Addr,
-			Logo:      res.Restaurants[i].Logo,
+			Logo:      &logo,
 			Cover:     res.Restaurants[i].Cover,
 			LikeCount: int(res.Restaurants[i].LikeCount),
-			Owner: &common.SimpleUser{
+			Owner: common.SimpleUser{
 				SqlModel: common.SqlModel{
 					Id: int(res.Restaurants[i].Owner.Id),
 				},

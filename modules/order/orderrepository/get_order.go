@@ -7,8 +7,6 @@ import (
 	"fooddelivery-order-service/modules/order/ordermodel"
 	"fooddelivery-order-service/modules/orderdetails/orderdetailmodel"
 	"fooddelivery-order-service/modules/ordertracking/ordertrackingmodel"
-	"fooddelivery-order-service/proto/restaurant"
-	"google.golang.org/grpc"
 	"log"
 )
 
@@ -30,7 +28,7 @@ type orderTrackingStore interface {
 }
 
 type restaurantService interface {
-	GetRestaurantByIds(ctx context.Context, in *restaurant.RestaurantRequest, opts ...grpc.CallOption) (*restaurant.RestaurantResponse, error)
+	GetRestaurants(ctx context.Context, ids []int) ([]common.Restaurant, error)
 }
 
 type getOrderRepository struct {
@@ -50,8 +48,6 @@ func (repo *getOrderRepository) GetOrders(
 	paging common.Paging,
 ) ([]ordermodel.GetOrderType, error) {
 	orders, err := repo.store.Find(ctx, userId, paging)
-
-	//resturantIds := make([]int, len(orders))
 
 	if err != nil {
 		return nil, common.ErrEntityNotFound(ordermodel.TableOrderName, err)
@@ -84,15 +80,40 @@ func (repo *getOrderRepository) GetOrders(
 		}
 	}
 
+	cacheResId := make(map[int]int, len(orders))
+	var resIds []int
+
 	for i, item := range orders {
+		var food orderdetailmodel.FoodOrigin
+		_ = json.Unmarshal([]byte(cacheTrackingDetail[item.Id].FoodOrigin), &food)
+
 		orders[i].State = cacheTrackingDetail[item.Id].State
-		orders[i].FoodOrigin = cacheTrackingDetail[item.Id].FoodOrigin
+		orders[i].FoodOrigin = &food
+
+		if _, ok := cacheResId[food.RestaurantId]; !ok {
+			resIds = append(resIds, food.RestaurantId)
+			cacheResId[food.RestaurantId] = food.RestaurantId
+			orders[i].RestaurantId = food.RestaurantId
+		}
 	}
 
-	for _, item := range orders {
-		var food orderdetailmodel.FoodOrigin
-		_ = json.Unmarshal([]byte(item.FoodOrigin), &food)
-		log.Println(food.RestaurantId)
+	restaurants, errRestaurant := repo.restaurantService.GetRestaurants(ctx, resIds)
+
+	if errRestaurant != nil {
+		log.Println("errRestaurant ", errRestaurant)
+	}
+
+	cacheRestaurant := make(map[int]common.Restaurant, len(restaurants))
+
+	for i, item := range restaurants {
+		cacheRestaurant[item.Owner.Id] = restaurants[i]
+	}
+
+	for i, item := range orders {
+		if restaurant, ok := cacheRestaurant[item.RestaurantId]; ok {
+			orders[i].Name = restaurant.Name
+			orders[i].Logo = restaurant.Logo
+		}
 	}
 
 	return orders, nil

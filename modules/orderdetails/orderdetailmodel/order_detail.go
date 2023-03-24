@@ -49,11 +49,12 @@ func (fdOrigin FoodOrigin) Marshal() (error, string) {
 
 type OrderDetail struct {
 	common.SqlModel `json:",inline"`
-	OrderId         int     `json:"orderId" gorm:"column:order_id"`
-	FoodOrigin      string  `json:"foodOrigin" gorm:"column:food_origin"`
-	Price           float32 `json:"price" gorm:"column:price"`
-	Quantity        int     `json:"quantity" gorm:"column:quantity"`
-	Discount        float32 `json:"discount" gorm:"column:quantity"`
+	OrderId         int         `json:"orderId" gorm:"column:order_id"`
+	FoodOrigin      string      `json:"-" gorm:"column:food_origin"`
+	Food            *FoodOrigin `json:"foodOrigin" gorm:"-"`
+	Price           float32     `json:"price" gorm:"column:price"`
+	Quantity        int         `json:"quantity" gorm:"column:quantity"`
+	Discount        float32     `json:"discount" gorm:"column:quantity"`
 }
 
 func (OrderDetail) TableName() string {

@@ -3,16 +3,11 @@ package orderdetailbiz
 import (
 	"context"
 	"fooddelivery-order-service/common"
-	"fooddelivery-order-service/modules/order/ordermodel"
 	"fooddelivery-order-service/modules/orderdetails/orderdetailmodel"
 )
 
 type OrderDetailStore interface {
 	Create(ctx context.Context, orderDetail orderdetailmodel.OrderDetail) error
-}
-
-type OrderStore interface {
-	FindByCondition(ctx context.Context, condition map[string]interface{}, moreKeys ...string) (*ordermodel.Order, error)
 }
 
 type orderDetailBiz struct {

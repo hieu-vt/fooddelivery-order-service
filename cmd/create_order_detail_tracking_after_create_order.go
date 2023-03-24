@@ -46,6 +46,9 @@ var StartCreateOrderDetailTrackingAfterCreateOrder = &cobra.Command{
 					Price:      float32(msg.Data()["price"].(float64)),
 					Quantity:   int(msg.Data()["quantity"].(float64)),
 					Discount:   float32(msg.Data()["discount"].(float64)),
+					SqlModel: common.SqlModel{
+						Status: 1,
+					},
 				})
 			})
 
@@ -56,6 +59,9 @@ var StartCreateOrderDetailTrackingAfterCreateOrder = &cobra.Command{
 				return biz.CreateOrderTracking(ctx, ordertrackingmodel.OrderTracking{
 					OrderId: int(msg.Data()["order_id"].(float64)),
 					State:   common.WaitingForShipper,
+					SqlModel: common.SqlModel{
+						Status: 1,
+					},
 				})
 			})
 

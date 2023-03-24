@@ -3,53 +3,16 @@ package orderdetailbiz
 import (
 	"context"
 	"errors"
-	"order-service/common"
-	"order-service/modules/order/ordermodel"
-	"order-service/modules/orderdetails/orderdetailmodel"
+	"fooddelivery-order-service/common"
+	"fooddelivery-order-service/modules/order/ordermodel"
+	"fooddelivery-order-service/modules/orderdetails/orderdetailmodel"
 	"testing"
 )
 
 type mockOrderDetailStore struct {
 }
 
-type mockOrderStore struct {
-}
-
-func (s *mockOrderStore) FindByCondition(ctx context.Context, condition map[string]interface{}, moreKeys ...string) (*ordermodel.Order, error) {
-	var result *ordermodel.Order
-	var error error
-
-	result = &ordermodel.Order{
-		SqlModel: common.SqlModel{
-			Status: 1,
-		},
-		UserId:     0,
-		ShipperId:  0,
-		TotalPrice: 0,
-	}
-
-	for i := range condition {
-		if condition[i] == 3 {
-			result = nil
-			error = errors.New("something wrong with db")
-		}
-
-		if condition[i] == 4 {
-			result = &ordermodel.Order{
-				SqlModel: common.SqlModel{
-					Status: 0,
-				},
-				UserId:     0,
-				ShipperId:  0,
-				TotalPrice: 0,
-			}
-		}
-	}
-
-	return result, error
-}
-
-func (s *mockOrderDetailStore) Create(ctx context.Context, orderDetail *orderdetailmodel.OrderDetail) error {
+func (mockOrderDetailStore) Create(ctx context.Context, orderDetail orderdetailmodel.OrderDetail) error {
 	if orderDetail.OrderId == 2 {
 		return errors.New("something wrong with db")
 	}
@@ -64,8 +27,7 @@ type testingItem struct {
 
 func TestOrderDetailBiz_CreateOrderDetail(t *testing.T) {
 	store := &mockOrderDetailStore{}
-	orderStore := &mockOrderStore{}
-	biz := NewOrderDetailBiz(store, orderStore)
+	biz := NewOrderDetailBiz(store)
 
 	dataTable := []testingItem{
 		{
@@ -134,7 +96,7 @@ func TestOrderDetailBiz_CreateOrderDetail(t *testing.T) {
 	}
 
 	for _, item := range dataTable {
-		actual := biz.CreateOrderDetail(context.Background(), &item.Input)
+		actual := biz.CreateOrderDetail(context.Background(), item.Input)
 
 		if actual == nil {
 			if item.Expected != nil {
